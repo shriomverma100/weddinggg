@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #F7F6F1;
+    --bg-secondary: #F1EFE7;
+    --surface-white: #FFFFFF;
+    --gold-champagne: #C9AE82;
+    --gold-muted: #BDA276;
+    --gold-light: #D8C5A5;
+    --text-main: #34342E;
+    --text-secondary: #879083;
+    --text-muted: #A99D8D;
+    --border-color: #DDDCD3;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Typography Helpers */
+.font-serif {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-script {
+  font-family: 'Allura', cursive;
+}
+
+.font-sans {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Color Utilities */
+.bg-main { background-color: #F7F6F1; }
+.bg-secondary { background-color: #F1EFE7; }
+.bg-surface { background-color: #FFFFFF; }
+.border-theme { border-color: #DDDCD3; }
+.border-gold { border-color: #C9AE82; }
+.border-gold-muted { border-color: #BDA276; }
+.border-gold-light { border-color: #D8C5A5; }
+
+.text-main { color: #34342E; }
+.text-secondary { color: #879083; }
+.text-muted { color: #A99D8D; }
+.text-champagne { color: #C9AE82; }
+.text-gold-muted { color: #BDA276; }
+
+/* Subtle Arch frame */
+.arch-frame {
+  border-top-left-radius: 9999px;
+  border-top-right-radius: 9999px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  overflow: hidden;
+}
+
+/* Traditional card corner flourish */
+.corner-ornament {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: #C9AE82;
+}
+
+/* ── Motion (transform/opacity only → composited, smooth 60fps) ── */
+
+/* Section fade-up on first view */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* "Tap to Open" breathing cue — signals interactivity without being noisy */
+@keyframes tapPulse {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+.tap-pulse {
+  display: inline-block;
+  animation: tapPulse 2.4s ease-in-out infinite;
+}
+
+/* Monogram slow glow ring */
+@keyframes monogramGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 174, 130, 0); }
+  50% { box-shadow: 0 0 0 8px rgba(201, 174, 130, 0.12); }
+}
+.opening-monogram {
+  animation: monogramGlow 3.2s ease-in-out infinite;
+}
+
+/* Revealed date — a small "reward" pop */
+@keyframes datePop {
+  0% { transform: scale(0.94); opacity: 0.6; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.date-pop {
+  animation: datePop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .tap-pulse, .opening-monogram, .date-pop { animation: none; }
+}
+
