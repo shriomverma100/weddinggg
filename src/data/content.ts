@@ -37,9 +37,9 @@ export const FAMILY = {
   heading: 'The Family Behind the Love',
   inLovingMemory: 'Late Smt. Rama Chourasia',
   blessings: [
-    'Shri Narayan Prasad Chourasia Ji',
-    'Smt. Rajni Devi Prasad Chourasia Ji',
-    'Smt. Bhavna Amit Chourasia',
+    'Shri Narayan Prasad Chourasia',
+    'Smt. Rajni Devi Prasad Chourasia',
+    'Smt. Bhawana Amit Chourasia',
     'Smt. Sandhya Vineet Chourasia',
     'Smt. Kanchan Sapanraj Chourasia',
     'Smt. Mansee Paritosh Chourasia',

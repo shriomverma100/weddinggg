@@ -24,7 +24,7 @@ export const TraditionalInvitation: React.FC = () => (
         <CornerSprig className="absolute bottom-3 left-3 w-9 h-9" flip="y" />
         <CornerSprig className="absolute bottom-3 right-3 w-9 h-9" flip="xy" />
 
-        <GaneshaIcon className="w-12 h-14 mx-auto mb-3" />
+        <GaneshaIcon className="w-[88px] h-[114px] mx-auto mb-2" />
 
         <p className="flex items-center gap-2.5 mb-5">
           <Accent />
