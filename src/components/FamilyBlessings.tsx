@@ -5,13 +5,13 @@ import { Divider } from './Divider';
 import { Reveal } from './Reveal';
 
 const GroupLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="font-sans text-[10.5px] uppercase tracking-[0.25em] text-[#8C6F43] font-semibold mb-3">{children}</p>
+  <p className="t-label text-[10.5px] mb-3">{children}</p>
 );
 
 const NameList: React.FC<{ names: string[] }> = ({ names }) => (
   <ul className="flex flex-col gap-1.5">
     {names.map((n) => (
-      <li key={n} className="font-serif text-[18px] leading-snug text-[#34342E]">
+      <li key={n} className="t-display text-[17px] leading-snug">
         {n}
       </li>
     ))}
@@ -25,7 +25,7 @@ export const FamilyBlessings: React.FC = () => {
   return (
     <Reveal className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[500px] mx-auto py-6 px-4">
       <div className="w-full bg-white rounded-2xl border border-[#DDDCD3] shadow-xs py-10 px-6 sm:px-8 text-center flex flex-col items-center">
-        <h3 className="font-serif text-[28px] sm:text-3xl text-[#34342E] font-normal tracking-tight mb-4">
+        <h3 className="t-display text-[30px] leading-tight mb-4">
           {FAMILY.heading}
         </h3>
         <Divider className="w-24 mb-8" />
@@ -34,7 +34,7 @@ export const FamilyBlessings: React.FC = () => {
         <div className="w-full rounded-xl bg-[#F7F4EC] border border-[#EDE6D6] py-5 px-4 mb-9">
           <Flame className="w-4 h-4 mx-auto mb-2 text-[#C9AE82]" strokeWidth={1.5} aria-hidden="true" />
           <GroupLabel>In Loving Memory of</GroupLabel>
-          <p className="font-serif italic text-[20px] text-[#34342E]">{FAMILY.inLovingMemory}</p>
+          <p className="t-poetic text-[23px] text-[#2E2B26]">{FAMILY.inLovingMemory}</p>
         </div>
 
         <div className="mb-9">
@@ -51,12 +51,12 @@ export const FamilyBlessings: React.FC = () => {
 
         <div className="mb-10">
           <GroupLabel>Little Ones</GroupLabel>
-          <p className="font-serif text-[18px] text-[#34342E]">{joinNames(FAMILY.kids)}</p>
+          <p className="t-display text-[18px]">{joinNames(FAMILY.kids)}</p>
         </div>
 
         <Divider className="w-16 mb-6" small />
 
-        <blockquote className="font-serif italic text-[21px] sm:text-[22px] leading-relaxed text-[#34342E] max-w-[320px]">
+        <blockquote className="t-poetic text-[24px] leading-snug text-[#2E2B26] max-w-[320px]">
           {FAMILY.tagline.map((line) => (
             <span key={line} className="block">
               {line}

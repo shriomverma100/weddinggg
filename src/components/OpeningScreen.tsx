@@ -48,21 +48,21 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onOpen, isOpen }) 
         <div className="flex flex-col items-center justify-center my-auto">
           {/* Monogram A | J */}
           <div className="w-28 h-28 rounded-full flex items-center justify-center border border-[#C9AE82] mb-7 opening-monogram">
-            <span className="font-serif text-3xl font-light text-[#F1EFE7] flex items-center gap-3">
+            <span className="t-display text-[32px] font-normal text-[#F1EFE7] flex items-center gap-3">
               <span>{COUPLE.monogram[0]}</span>
               <span className="w-px h-7 bg-[#C9AE82]/80" aria-hidden="true" />
               <span>{COUPLE.monogram[1]}</span>
             </span>
           </div>
 
-          <p className="font-sans text-[11px] tracking-[0.28em] text-white/90 uppercase font-medium">
+          <p className="t-label text-[11px] tracking-[0.26em] text-white/90">
             You Are Cordially Invited
           </p>
         </div>
 
         {/* Call to action — a soft pulse tells the guest this is tappable */}
         <div className="flex flex-col items-center">
-          <span className="font-serif italic text-xl tracking-wide text-white tap-pulse">Tap to Open</span>
+          <span className="t-poetic text-[23px] text-white tap-pulse">Tap to Open</span>
           <div className="w-16 h-px mt-2 bg-[#C9AE82]" />
         </div>
       </div>

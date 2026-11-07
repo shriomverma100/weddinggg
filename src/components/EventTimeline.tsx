@@ -42,45 +42,45 @@ const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ e
         } ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
       >
         <header className="flex items-center justify-between border-b border-[#F1EFE7] pb-3 mb-3 gap-2">
-          <span className="font-sans text-[10.5px] uppercase tracking-[0.2em] font-semibold text-[#8C6F43]">
+          <span className="t-label text-[10.5px]">
             Event {event.number}
           </span>
           <span className="flex items-center gap-2">
             {status === 'today' && (
-              <span className="font-sans text-[9.5px] uppercase tracking-[0.15em] font-semibold text-white bg-[#C9AE82] rounded-full px-2 py-0.5">
+              <span className="t-label text-[8.5px] text-white bg-[#C9AE82] rounded-full px-2 py-0.5">
                 Today
               </span>
             )}
             {status === 'past' && (
-              <span className="font-sans text-[9.5px] uppercase tracking-[0.15em] font-semibold text-[#8A8173]">Concluded</span>
+              <span className="t-label text-[8.5px] text-[#8A8173]">Concluded</span>
             )}
-            <span className="font-sans text-[11.5px] tracking-wide text-[#6F786C]">
+            <span className="t-detail text-[11.5px]">
               {formatWeekday(event.startISO).slice(0, 3)}, {formatDate(event.startISO)}
             </span>
           </span>
         </header>
 
-        <h3 className="font-serif text-[26px] text-[#34342E] font-medium tracking-tight mb-1.5">{event.title}</h3>
+        <h3 className="t-display text-[26px] leading-tight mb-1.5">{event.title}</h3>
 
-        <p className="font-serif italic text-[17px] leading-snug text-[#5A5952] mb-5">{event.description}</p>
+        <p className="t-poetic text-[18.5px] leading-snug mb-5">{event.description}</p>
 
         <dl className="flex flex-col gap-2.5 pt-3 border-t border-[#F1EFE7] text-[12.5px]">
           <div className="flex items-center gap-2.5">
             <Clock className="w-4 h-4 text-[#C9AE82] shrink-0" strokeWidth={1.5} aria-hidden="true" />
             <dt className="sr-only">Time</dt>
-            <dd className="font-sans text-[#34342E] font-medium">{formatTime(event.startISO)} onwards</dd>
+            <dd className="t-detail font-semibold text-[#2E2B26]">{formatTime(event.startISO)} onwards</dd>
           </div>
           {event.dressCode && (
             <div className="flex items-center gap-2.5">
               <Shirt className="w-4 h-4 text-[#C9AE82] shrink-0" strokeWidth={1.5} aria-hidden="true" />
               <dt className="sr-only">Dress code</dt>
-              <dd className="font-sans text-[#5A5952]">{event.dressCode}</dd>
+              <dd className="t-detail">{event.dressCode}</dd>
             </div>
           )}
           <div className="flex items-start gap-2.5">
             <MapPin className="w-4 h-4 text-[#C9AE82] shrink-0 mt-px" strokeWidth={1.5} aria-hidden="true" />
             <dt className="sr-only">Venue</dt>
-            <dd className="font-sans text-[#5A5952] leading-snug">{event.venue}</dd>
+            <dd className="t-detail leading-snug">{event.venue}</dd>
           </div>
         </dl>
 

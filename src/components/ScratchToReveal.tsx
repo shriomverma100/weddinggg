@@ -61,10 +61,10 @@ export const ScratchToReveal: React.FC = () => {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#34342E';
-    ctx.font = 'italic 24px "Cormorant Garamond", Georgia, serif';
+    ctx.font = 'italic 500 27px "Cormorant Garamond", Georgia, serif';
     ctx.fillText('Scratch to Reveal', w / 2, h / 2 - 12);
     ctx.fillStyle = '#8C6F43';
-    ctx.font = '600 11px "Montserrat", sans-serif';
+    ctx.font = '600 11px "Cinzel", serif';
     ctx.letterSpacing = '0.25em';
     ctx.fillText('THE DATE', w / 2, h / 2 + 18);
     ctx.letterSpacing = '0px';
@@ -78,7 +78,10 @@ export const ScratchToReveal: React.FC = () => {
   useEffect(() => {
     // Wait for web fonts so the canvas text renders in the right typeface.
     let cancelled = false;
-    (document.fonts?.ready ?? Promise.resolve()).then(() => !cancelled && paintSurface());
+    Promise.all([
+      document.fonts?.load('italic 500 27px "Cormorant Garamond"').catch(() => []),
+      document.fonts?.load('600 11px "Cinzel"').catch(() => []),
+    ]).then(() => !cancelled && paintSurface());
     paintSurface();
 
     // Only repaint on real width changes — mobile URL-bar show/hide changes height and must not wipe progress.
@@ -131,6 +134,9 @@ export const ScratchToReveal: React.FC = () => {
     const ctx = ctxRef.current;
     if (!ctx) return;
     ctx.globalCompositeOperation = 'destination-out';
+    // erase strength = source alpha, so use fully opaque colours (the paint step leaves translucent ones set)
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = BRUSH_RADIUS * 2;
@@ -215,13 +221,13 @@ export const ScratchToReveal: React.FC = () => {
       >
         <div className={`flex flex-col items-center ${isRevealed ? 'date-pop' : ''}`}>
           <div className="w-10 h-0.5 bg-[#C9AE82] mb-3 rounded-full" />
-          <p className="font-sans text-[11px] uppercase tracking-[0.25em] text-[#8C6F43] font-semibold mb-2">
+          <p className="t-label text-[11px] mb-2">
             Save the Date
           </p>
-          <h2 className="font-serif text-4xl sm:text-[42px] text-[#34342E] tracking-tight font-normal leading-tight">
+          <h2 className="t-display text-[38px] sm:text-[42px] leading-tight">
             {date}
           </h2>
-          <p className="font-sans text-[11.5px] tracking-[0.12em] text-[#6F786C] mt-2">
+          <p className="t-detail text-[12px] mt-2">
             {formatWeekday(WEDDING_DATE_ISO)} · {formatTime(WEDDING_DATE_ISO)}
           </p>
           <div className="w-6 h-px bg-[#D8C5A5] mt-3" />
@@ -255,7 +261,7 @@ export const ScratchToReveal: React.FC = () => {
             style={{ transform: `scaleX(${progress})` }}
           />
         </div>
-        <p className="font-sans text-[11px] tracking-wide text-[#8A8173]">
+        <p className="t-detail text-[11px]">
           {progress === 0 ? 'Scratch the card with your finger' : progress < 0.7 ? 'Keep going…' : 'Almost there!'}
         </p>
       </div>
