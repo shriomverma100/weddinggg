@@ -121,7 +121,7 @@
 
 /* ════════════════════════════════════════════════════════════
    TYPE SYSTEM — one font per role, so every text reads by its importance
-     .t-script   Great Vibes        calligraphy: Aditi & Jeet, Chourasia Family
+     .t-script   Playball           calligraphy: Aditi & Jeet, Chourasia Family
      .t-display  Playfair Display   headings · names · numbers
      .t-label    Cinzel             royal small-caps labels
      .t-poetic   Cormorant italic   blessings · mood lines · quotes
@@ -129,7 +129,7 @@
    (in the components layer, so per-element size/colour utilities still win)
    ════════════════════════════════════════════════════════════ */
 @layer components {
-  .t-script  { font-family: 'Great Vibes', 'Playfair Display', cursive; font-weight: 400; color: #2E2B26; letter-spacing: 0.01em; padding: 0.06em 0.18em; }
+  .t-script  { font-family: 'Playball', 'Playfair Display', cursive; font-weight: 400; color: #2E2B26; letter-spacing: 0.01em; padding: 0.06em 0.18em; }
   .t-display { font-family: 'Playfair Display', Georgia, serif; font-weight: 500; color: #2E2B26; letter-spacing: -0.005em; font-variant-numeric: lining-nums; }
   .t-label   { font-family: 'Cinzel', 'Times New Roman', serif; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #8C6F43; }
   .t-poetic  { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 500; color: #4A4740; }

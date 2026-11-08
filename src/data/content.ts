@@ -7,7 +7,7 @@ export const COUPLE = {
   bride: 'Aditi',
   groom: 'Jeet',
   monogram: ['A', 'J'] as const,
-  brideParents: 'D/o Mr. Amit & Mrs. Bhavana Chourasia',
+  brideParents: 'D/o Mr. Amit & Mrs. Bhawana Chourasia',
   groomParents: 'S/o Mr. Mahesh & Mrs. Sangeeta Chourasia',
 };
 

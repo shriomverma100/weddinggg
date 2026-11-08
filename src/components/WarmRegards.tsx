@@ -9,6 +9,6 @@ export const WarmRegards: React.FC = () => (
       {CLOSING.regardsHeading}
     </p>
     <Divider className="w-16 mb-4" small />
-    <p className="t-script text-[48px] leading-[1.15]">{CLOSING.regardsFrom}</p>
+    <p className="t-script whitespace-nowrap text-[clamp(34px,11.4vw,48px)] leading-[1.15]">{CLOSING.regardsFrom}</p>
   </Reveal>
 );
