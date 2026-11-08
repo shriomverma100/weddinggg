@@ -3,13 +3,13 @@ import { CONTENT, type Content, type Lang } from './data/content';
 
 const KEY = 'invite-lang';
 
-const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: 'en', setLang: () => {} });
+const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: 'hi', setLang: () => {} });
 
 const initialLang = (): Lang => {
   try {
-    return localStorage.getItem(KEY) === 'hi' ? 'hi' : 'en'; // English is the default
+    return localStorage.getItem(KEY) === 'en' ? 'en' : 'hi'; // Hindi is the default
   } catch {
-    return 'en';
+    return 'hi';
   }
 };
 
