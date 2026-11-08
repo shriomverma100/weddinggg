@@ -14,6 +14,8 @@ import { ClosingMessage } from './components/ClosingMessage';
 import { MusicToggle } from './components/MusicToggle';
 import { LanguageToggle } from './components/LanguageToggle';
 import { music } from './audio/player';
+import { useLang } from './i18n';
+import type { Lang } from './data/content';
 
 // Music can only start from a tap, so it begins with "Tap to open" — unless the guest muted it on an earlier visit.
 const openInvitation = (setIsOpen: (v: boolean) => void) => {
@@ -29,6 +31,12 @@ const openInvitation = (setIsOpen: (v: boolean) => void) => {
 
 export const App: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { setLang } = useLang();
+  // The guest picks a language on the cover; the invitation opens in it.
+  const openIn = (lang: Lang) => {
+    setLang(lang);
+    openInvitation(setIsOpen);
+  };
   // The countdown stays still until the guest scratches the date open.
   const [dateRevealed, setDateRevealed] = useState(false);
 
@@ -42,9 +50,9 @@ export const App: React.FC = () => {
     <div className="min-h-screen w-full bg-[#EFECE4] flex justify-center selection:bg-[#D8C5A5]/40">
       <main className="w-full sm:max-w-[520px] md:max-w-[560px] lg:max-w-[580px] min-h-screen bg-[#F7F6F1] sm:shadow-2xl relative overflow-x-hidden flex flex-col sm:border-x sm:border-[#DDDCD3]/50">
         <FallingPetals isOpened={isOpen} />
-        <OpeningScreen isOpen={isOpen} onOpen={() => openInvitation(setIsOpen)} />
+        <OpeningScreen isOpen={isOpen} onOpen={openIn} />
         <MusicToggle visible={isOpen} />
-        <LanguageToggle />
+        <LanguageToggle visible={isOpen} />
 
         <div
           className={`w-full transition-opacity duration-1000 ${isOpen ? 'opacity-100' : 'opacity-0'}`}

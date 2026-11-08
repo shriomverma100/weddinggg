@@ -7,8 +7,9 @@ const OPTIONS: { value: Lang; label: string; aria: string }[] = [
   { value: 'hi', label: 'हिं', aria: 'हिन्दी (Hindi)' },
 ];
 
-/** Top-right EN | हिं switch — a small gold-edged pill with a sliding highlight. Visible on the opening screen too. */
-export const LanguageToggle: React.FC = () => {
+/** Top-right EN | हिं switch — a small gold-edged pill with a sliding highlight. Appears once the invitation is open
+ *  (on the cover, the "हिंदी में खोलें / Open in English" buttons do this job). */
+export const LanguageToggle: React.FC<{ visible?: boolean }> = ({ visible = true }) => {
   const { lang, setLang } = useLang();
   const idx = OPTIONS.findIndex((o) => o.value === lang);
 
@@ -39,7 +40,7 @@ export const LanguageToggle: React.FC = () => {
     // rail matching <main>'s width, so on desktop the switch sits at the card column's corner
     <div
       className={`fixed inset-x-0 top-0 z-[60] flex justify-center pointer-events-none transition-[transform,opacity] duration-300 ease-out ${
-        hidden ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+        hidden || !visible ? '-translate-y-full opacity-0 invisible' : 'translate-y-0 opacity-100'
       }`}
     >
       <div className="w-full sm:max-w-[520px] md:max-w-[560px] lg:max-w-[580px] flex justify-end p-3.5">
