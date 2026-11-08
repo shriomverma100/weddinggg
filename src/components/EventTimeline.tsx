@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, MapPin, ArrowUpRight, CalendarPlus, Shirt } from 'lucide-react';
-import { WEDDING_EVENTS, WeddingEvent, formatDate, formatTime, formatWeekday } from '../data/content';
+import type { WeddingEvent } from '../data/content';
+import { useContent } from '../i18n';
 import { googleCalendarUrl } from '../utils/calendar';
 import { useInView } from '../hooks/useInView';
 
@@ -15,10 +16,10 @@ const statusOf = (iso: string): 'today' | 'past' | null => {
   return null;
 };
 
-const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ event, index }) => {
+const TimelineEventCard: React.FC<{ event: WeddingEvent; isMain: boolean }> = ({ event, isMain }) => {
+  const { COUPLE, UI, fmt } = useContent();
   const [ref, inView] = useInView<HTMLDivElement>('0px 0px -50px 0px');
   const status = statusOf(event.startISO);
-  const isMain = index === WEDDING_EVENTS.length - 1;
 
   return (
     <div ref={ref} className={`relative ${status === 'past' ? 'opacity-70' : ''}`}>
@@ -43,19 +44,19 @@ const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ e
       >
         <header className="flex items-center justify-between border-b border-[#F1EFE7] pb-3 mb-3 gap-2">
           <span className="t-label text-[10.5px]">
-            Event {event.number}
+            {UI.event} {event.number}
           </span>
           <span className="flex items-center gap-2">
             {status === 'today' && (
               <span className="t-label text-[8.5px] text-white bg-[#C9AE82] rounded-full px-2 py-0.5">
-                Today
+                {UI.today}
               </span>
             )}
             {status === 'past' && (
-              <span className="t-label text-[8.5px] text-[#8A8173]">Concluded</span>
+              <span className="t-label text-[8.5px] text-[#8A8173]">{UI.concluded}</span>
             )}
             <span className="t-detail text-[11.5px]">
-              {formatWeekday(event.startISO).slice(0, 3)}, {formatDate(event.startISO)}
+              {fmt.weekdayShort(event.startISO)}, {fmt.date(event.startISO)}
             </span>
           </span>
         </header>
@@ -68,7 +69,7 @@ const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ e
           <div className="flex items-center gap-2.5">
             <Clock className="w-4 h-4 text-[#C9AE82] shrink-0" strokeWidth={1.5} aria-hidden="true" />
             <dt className="sr-only">Time</dt>
-            <dd className="t-detail font-semibold text-[#2E2B26]">{formatTime(event.startISO)} onwards</dd>
+            <dd className="t-detail font-semibold text-[#2E2B26]">{UI.onwards(fmt.time(event.startISO))}</dd>
           </div>
           {event.dressCode && (
             <div className="flex items-center gap-2.5">
@@ -88,7 +89,7 @@ const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ e
         <div className="mt-4 pt-1 border-t border-[#F1EFE7] flex items-center justify-between">
           <a
             href={googleCalendarUrl({
-              title: `${event.title} · Aditi & Jeet`,
+              title: `${event.title} · ${COUPLE.bride} & ${COUPLE.groom}`,
               startISO: event.startISO,
               location: event.venue,
               details: event.description,
@@ -98,7 +99,7 @@ const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ e
             className="inline-flex items-center gap-1.5 py-2.5 font-sans text-[11px] uppercase tracking-wider text-[#6F786C] hover:text-[#34342E] font-semibold transition-colors"
           >
             <CalendarPlus className="w-4 h-4" strokeWidth={1.5} aria-hidden="true" />
-            <span>Add to Calendar</span>
+            <span>{UI.addToCalendar}</span>
           </a>
           <a
             href={event.directionsUrl}
@@ -106,7 +107,7 @@ const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ e
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 py-2.5 font-sans text-[11px] uppercase tracking-wider text-[#8C6F43] hover:text-[#34342E] font-semibold transition-colors"
           >
-            <span>Directions</span>
+            <span>{UI.directions}</span>
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
           </a>
         </div>
@@ -115,15 +116,18 @@ const TimelineEventCard: React.FC<{ event: WeddingEvent; index: number }> = ({ e
   );
 };
 
-export const EventTimeline: React.FC = () => (
+export const EventTimeline: React.FC = () => {
+  const { WEDDING_EVENTS } = useContent();
+  return (
   <section className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[500px] mx-auto py-6 px-4">
     <div className="relative pl-6 sm:pl-8">
       <div className="absolute left-[11px] sm:left-[15px] top-6 bottom-8 w-px bg-[#DDDCD3]" aria-hidden="true" />
       <div className="flex flex-col gap-8">
         {WEDDING_EVENTS.map((event, index) => (
-          <TimelineEventCard key={event.number} event={event} index={index} />
+          <TimelineEventCard key={event.number} event={event} isMain={index === WEDDING_EVENTS.length - 1} />
         ))}
       </div>
     </div>
   </section>
-);
+  );
+};

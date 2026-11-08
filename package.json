@@ -10,11 +10,14 @@
     "start": "vite preview --port $PORT --host 0.0.0.0"
   },
   "dependencies": {
+    "@fontsource/amita": "^5.3.0",
     "@fontsource/cinzel": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/montserrat": "^5.3.0",
+    "@fontsource/mukta": "^5.3.0",
     "@fontsource/playball": "^5.3.0",
     "@fontsource/playfair-display": "^5.3.0",
+    "@fontsource/tiro-devanagari-hindi": "^5.3.0",
     "lucide-react": "^1.16.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

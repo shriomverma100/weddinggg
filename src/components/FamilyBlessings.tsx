@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flame } from 'lucide-react';
-import { FAMILY } from '../data/content';
+import { useContent } from '../i18n';
 import { Divider } from './Divider';
 import { Reveal } from './Reveal';
 
@@ -18,10 +18,11 @@ const NameList: React.FC<{ names: string[] }> = ({ names }) => (
   </ul>
 );
 
-const joinNames = (names: string[]) =>
-  names.length > 1 ? `${names.slice(0, -1).join(', ')} & ${names[names.length - 1]}` : names[0];
+const joinNames = (names: string[], and: string) =>
+  names.length > 1 ? `${names.slice(0, -1).join(', ')} ${and} ${names[names.length - 1]}` : names[0];
 
 export const FamilyBlessings: React.FC = () => {
+  const { FAMILY, UI } = useContent();
   return (
     <Reveal className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[500px] mx-auto py-6 px-4">
       <div className="w-full bg-white rounded-2xl border border-[#DDDCD3] shadow-xs py-10 px-6 sm:px-8 text-center flex flex-col items-center">
@@ -33,25 +34,25 @@ export const FamilyBlessings: React.FC = () => {
         {/* In loving memory — set apart and quieter, with a small diya flame */}
         <div className="w-full rounded-xl bg-[#F7F4EC] border border-[#EDE6D6] py-5 px-4 mb-9">
           <Flame className="w-4 h-4 mx-auto mb-2 text-[#C9AE82]" strokeWidth={1.5} aria-hidden="true" />
-          <GroupLabel>In Loving Memory of</GroupLabel>
+          <GroupLabel>{UI.inLovingMemory}</GroupLabel>
           <p className="t-poetic text-[23px] text-[#2E2B26]">{FAMILY.inLovingMemory}</p>
         </div>
 
         <div className="mb-9">
-          <GroupLabel>With the Blessings of</GroupLabel>
+          <GroupLabel>{UI.withBlessings}</GroupLabel>
           <NameList names={FAMILY.blessings} />
         </div>
 
         <div className="w-12 h-px bg-[#DDDCD3] mb-9" />
 
         <div className="mb-9">
-          <GroupLabel>Siblings</GroupLabel>
+          <GroupLabel>{UI.siblings}</GroupLabel>
           <NameList names={FAMILY.siblings} />
         </div>
 
         <div className="mb-10">
-          <GroupLabel>Little Ones</GroupLabel>
-          <p className="t-display text-[18px]">{joinNames(FAMILY.kids)}</p>
+          <GroupLabel>{UI.littleOnes}</GroupLabel>
+          <p className="t-display text-[18px]">{joinNames(FAMILY.kids, UI.and)}</p>
         </div>
 
         {/* Family tagline as a pull-quote: soft sage-to-champagne blend, oversized gold quote marks */}
@@ -82,7 +83,7 @@ export const FamilyBlessings: React.FC = () => {
           </blockquote>
           <figcaption className="relative mt-4 flex items-center justify-center gap-2">
             <span className="w-6 h-px bg-[#C9AE82]" />
-            <span className="t-label text-[9.5px] text-[#8C6F43]">The Chourasia Family</span>
+            <span className="t-label text-[9.5px] text-[#8C6F43]">{UI.familySignature}</span>
             <span className="w-6 h-px bg-[#C9AE82]" />
           </figcaption>
         </figure>

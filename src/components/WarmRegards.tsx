@@ -1,14 +1,15 @@
 import React from 'react';
-import { CLOSING } from '../data/content';
+import { useContent } from '../i18n';
 import { Divider } from './Divider';
 import { Reveal } from './Reveal';
 
-export const WarmRegards: React.FC = () => (
-  <Reveal className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[500px] mx-auto py-7 px-6 text-center">
-    <p className="t-label text-[11px] mb-3">
-      {CLOSING.regardsHeading}
-    </p>
-    <Divider className="w-16 mb-4" small />
-    <p className="t-script whitespace-nowrap text-[clamp(34px,11.4vw,48px)] leading-[1.15]">{CLOSING.regardsFrom}</p>
-  </Reveal>
-);
+export const WarmRegards: React.FC = () => {
+  const { CLOSING } = useContent();
+  return (
+    <Reveal className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[500px] mx-auto py-7 px-6 text-center">
+      <p className="t-label text-[11px] mb-3">{CLOSING.regardsHeading}</p>
+      <Divider className="w-16 mb-4" small />
+      <p className="t-script whitespace-nowrap text-[clamp(34px,11.4vw,48px)] leading-[1.15]">{CLOSING.regardsFrom}</p>
+    </Reveal>
+  );
+};

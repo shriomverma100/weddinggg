@@ -1,13 +1,14 @@
 import React from 'react';
 import { GaneshaIcon } from './GaneshaIcon';
-import { COUPLE, INVITATION } from '../data/content';
+import { useContent } from '../i18n';
 import { JewelBand, CornerSprig, JewelDivider, Accent } from './Decor';
 
-// "|| Shree Ganeshaya Namah ||" → the bars are drawn as gold accents instead of text glyphs
-const invocation = INVITATION.invocation.replace(/\|/g, '').trim();
-
 /** Royal stationery card: double gold frame, jewel bands top & bottom, leaf-sprig corners. */
-export const TraditionalInvitation: React.FC = () => (
+export const TraditionalInvitation: React.FC = () => {
+  const { COUPLE, INVITATION } = useContent();
+  // "|| Shree Ganeshaya Namah ||" → the bars are drawn as gold accents instead of text glyphs
+  const invocation = INVITATION.invocation.replace(/\|/g, '').trim();
+  return (
   <section className="w-full flex justify-center py-6 px-4">
     <div className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[500px] bg-white rounded-xl relative p-2.5 border border-[#DCCFB0] shadow-[0_1px_2px_rgba(70,55,30,0.06),0_18px_40px_-26px_rgba(70,55,30,0.45)]">
       <div className="relative w-full rounded-lg border border-[#D8C5A5] bg-[#FFFDF8] pt-14 pb-14 px-7 flex flex-col items-center text-center">
@@ -72,4 +73,5 @@ export const TraditionalInvitation: React.FC = () => (
       </div>
     </div>
   </section>
-);
+  );
+};

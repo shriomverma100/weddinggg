@@ -12,6 +12,7 @@ import { NoteOnGifts } from './components/NoteOnGifts';
 import { WarmRegards } from './components/WarmRegards';
 import { ClosingMessage } from './components/ClosingMessage';
 import { MusicToggle } from './components/MusicToggle';
+import { LanguageToggle } from './components/LanguageToggle';
 import { music } from './audio/player';
 
 // Music can only start from a tap, so it begins with "Tap to open" — unless the guest muted it on an earlier visit.
@@ -43,6 +44,7 @@ export const App: React.FC = () => {
         <FallingPetals isOpened={isOpen} />
         <OpeningScreen isOpen={isOpen} onOpen={() => openInvitation(setIsOpen)} />
         <MusicToggle visible={isOpen} />
+        <LanguageToggle />
 
         <div
           className={`w-full transition-opacity duration-1000 ${isOpen ? 'opacity-100' : 'opacity-0'}`}

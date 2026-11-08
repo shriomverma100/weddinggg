@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pointer } from 'lucide-react';
-import { WEDDING_DATE_ISO, formatDate, formatTime, formatWeekday } from '../data/content';
+import { WEDDING_DATE_ISO } from '../data/content';
+import { useContent, useLang } from '../i18n';
 
 const BRUSH_RADIUS = 16; // smaller brush = a longer, more satisfying scratch
 const REVEAL_AT = 0.55; // fraction of the card that must be scratched
@@ -36,6 +37,11 @@ export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal 
   const [touched, setTouched] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const revealedRef = useRef(false);
+  const { UI, fmt } = useContent();
+  const { lang } = useLang();
+  // the canvas paints outside React's render, so it reads the current wording from a ref
+  const surfaceText = useRef({ title: UI.scratchTitle, sub: UI.scratchSub, lang });
+  surfaceText.current = { title: UI.scratchTitle, sub: UI.scratchSub, lang };
   const onRevealRef = useRef(onReveal);
   onRevealRef.current = onReveal;
 
@@ -171,12 +177,16 @@ export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#34342E';
-    ctx.font = 'italic 500 27px "Cormorant Garamond", Georgia, serif';
-    ctx.fillText('Scratch to Reveal', w / 2, h / 2 - 12);
+    const { title, sub, lang: l } = surfaceText.current;
+    ctx.font =
+      l === 'hi'
+        ? '400 25px "Tiro Devanagari Hindi", Georgia, serif'
+        : 'italic 500 27px "Cormorant Garamond", Georgia, serif';
+    ctx.fillText(title, w / 2, h / 2 - 12);
     ctx.fillStyle = '#8C6F43';
-    ctx.font = '600 11px "Cinzel", serif';
-    ctx.letterSpacing = '0.25em';
-    ctx.fillText('THE DATE', w / 2, h / 2 + 18);
+    ctx.font = l === 'hi' ? '400 14px "Tiro Devanagari Hindi", serif' : '600 11px "Cinzel", serif';
+    ctx.letterSpacing = l === 'hi' ? '0.02em' : '0.25em'; // Devanagari words must stay joined
+    ctx.fillText(sub, w / 2, h / 2 + 19);
     ctx.letterSpacing = '0px';
 
     const cols = Math.ceil(w / CELL);
@@ -211,6 +221,25 @@ export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal 
       fxRaf.current = 0;
     };
   }, [paintSurface]);
+
+  // Language switched → repaint the foil in the new language (only if the guest hasn't started scratching).
+  const firstLang = useRef(lang);
+  useEffect(() => {
+    if (lang === firstLang.current && lang === 'en') return;
+    firstLang.current = lang;
+    let cancelled = false;
+    const repaint = () => !cancelled && !revealedRef.current && grid.current.count === 0 && paintSurface();
+    if (lang === 'hi') {
+      // the Devanagari font file only downloads on demand — wait for it so the canvas doesn't paint a fallback
+      Promise.all([
+        document.fonts?.load('400 25px "Tiro Devanagari Hindi"', 'खुरचें और देखें शुभ तिथि').catch(() => []),
+      ]).then(repaint);
+    }
+    repaint();
+    return () => {
+      cancelled = true;
+    };
+  }, [lang, paintSurface]);
 
   const markCoverage = (x: number, y: number) => {
     const gr = grid.current;
@@ -365,7 +394,7 @@ export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal 
     }
   };
 
-  const date = formatDate(WEDDING_DATE_ISO);
+  const date = fmt.date(WEDDING_DATE_ISO);
   const pct = Math.round(progress * 100);
 
   return (
@@ -378,13 +407,13 @@ export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal 
       >
         <div className={`relative flex flex-col items-center ${isRevealed ? 'date-pop' : ''}`}>
           <div className="w-10 h-0.5 bg-[#C9AE82] mb-3 rounded-full" />
-          <p className="t-label text-[11px] mb-2">Save the Date</p>
+          <p className="t-label text-[11px] mb-2">{UI.saveTheDate}</p>
           {/* always one line: scales with the phone width, caps at the desktop size */}
           <h2 className={`t-display whitespace-nowrap text-[clamp(26px,9vw,42px)] leading-tight ${isRevealed ? 'date-shine' : ''}`}>
             {date}
           </h2>
           <p className="t-detail text-[12px] mt-2">
-            {formatWeekday(WEDDING_DATE_ISO)} · {formatTime(WEDDING_DATE_ISO)}
+            {fmt.weekday(WEDDING_DATE_ISO)} · {fmt.time(WEDDING_DATE_ISO)}
           </p>
           <div className="w-6 h-px bg-[#D8C5A5] mt-3" />
         </div>
@@ -398,7 +427,7 @@ export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal 
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && reveal()}
           tabIndex={isRevealed ? -1 : 0}
           role="button"
-          aria-label={`Scratch to reveal the date. The date is ${date}.`}
+          aria-label={UI.scratchAria(date)}
           className={`absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing transition-[opacity,transform,filter] duration-700 ease-out ${
             isRevealed ? 'opacity-0 scale-110 blur-[2px] pointer-events-none' : 'opacity-100'
           }`}
@@ -433,12 +462,12 @@ export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal 
         </div>
         <p className="t-detail text-[11px] tabular-nums">
           {progress === 0
-            ? 'Scratch the card with your finger'
+            ? UI.scratchStart
             : progress < 0.5
-              ? `Keep going… ${pct}%`
+              ? UI.keepGoing(pct)
               : progress < 0.8
-                ? `Halfway there… ${pct}%`
-                : `Almost there! ${pct}%`}
+                ? UI.halfway(pct)
+                : UI.almost(pct)}
         </p>
       </div>
     </section>

@@ -17,7 +17,7 @@
   body {
     background-color: var(--bg-main);
     color: var(--text-main);
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Montserrat', 'Mukta', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
@@ -36,7 +36,7 @@
 }
 
 .font-sans {
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Montserrat', 'Mukta', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Color Utilities */
@@ -129,11 +129,11 @@
    (in the components layer, so per-element size/colour utilities still win)
    ════════════════════════════════════════════════════════════ */
 @layer components {
-  .t-script  { font-family: 'Playball', 'Playfair Display', cursive; font-weight: 400; color: #2E2B26; letter-spacing: 0.01em; padding: 0.06em 0.18em; }
-  .t-display { font-family: 'Playfair Display', Georgia, serif; font-weight: 500; color: #2E2B26; letter-spacing: -0.005em; font-variant-numeric: lining-nums; }
-  .t-label   { font-family: 'Cinzel', 'Times New Roman', serif; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #8C6F43; }
-  .t-poetic  { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 500; color: #4A4740; }
-  .t-detail  { font-family: 'Montserrat', sans-serif; color: #6A6E66; }
+  .t-script  { font-family: 'Playball', 'Amita', 'Playfair Display', cursive; font-weight: 400; color: #2E2B26; letter-spacing: 0.01em; padding: 0.06em 0.18em; }
+  .t-display { font-family: 'Playfair Display', 'Tiro Devanagari Hindi', Georgia, serif; font-weight: 500; color: #2E2B26; letter-spacing: -0.005em; font-variant-numeric: lining-nums; }
+  .t-label   { font-family: 'Cinzel', 'Tiro Devanagari Hindi', 'Times New Roman', serif; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #8C6F43; }
+  .t-poetic  { font-family: 'Cormorant Garamond', 'Tiro Devanagari Hindi', Georgia, serif; font-style: italic; font-weight: 500; color: #4A4740; }
+  .t-detail  { font-family: 'Montserrat', 'Mukta', sans-serif; color: #6A6E66; }
 }
 h1, h2, h3, blockquote { text-wrap: balance; }
 
@@ -191,3 +191,15 @@ h1, h2, h3, blockquote { text-wrap: balance; }
   .foil-sweep, .finger-hint, .finger-ripple, .scratch-revealed, .countdown-wake { animation: none; }
   .date-shine { animation: none; background: none; color: #2E2B26; }
 }
+
+/* ── Hindi (html[lang="hi"]) ──
+   Devanagari letters join along the top line (shirorekha), so wide letter-spacing would break the words apart;
+   capitals don't exist, and the matras need a touch more line height. Latin fonts keep handling numbers. */
+html[lang="hi"] .t-label,
+html[lang="hi"] [class*="tracking-"] { letter-spacing: 0.02em; }
+html[lang="hi"] .t-label { text-transform: none; font-weight: 400; zoom: 1.18; } /* Devanagari needs a little more size at label scale */
+html[lang="hi"] .uppercase { text-transform: none; }
+html[lang="hi"] .t-poetic { font-style: normal; }
+html[lang="hi"] .leading-snug { line-height: 1.5; }
+html[lang="hi"] .leading-tight { line-height: 1.35; }
+html[lang="hi"] .t-script { letter-spacing: 0; font-weight: 700; } /* Amita Bold calligraphy */

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { WEDDING_DATE_ISO, formatDate, formatTime, formatWeekday } from '../data/content';
+import { WEDDING_DATE_ISO } from '../data/content';
+import { useContent, useLang } from '../i18n';
 import { CornerSprig, JewelDivider } from './Decor';
 
 const TARGET = new Date(WEDDING_DATE_ISO).getTime();
@@ -21,12 +22,13 @@ const R = 31;
 const C = 2 * Math.PI * R;
 
 /** A gold dial: dotted outer ring, progress arc showing what's left of the unit, flipping number in the centre. */
-const Dial: React.FC<{ value: number; label: string; frac: number; flip: boolean; slow: boolean }> = ({
+const Dial: React.FC<{ value: number; label: string; frac: number; flip: boolean; slow: boolean; big?: boolean }> = ({
   value,
   label,
   frac,
   flip,
   slow,
+  big,
 }) => {
   const text = String(value).padStart(2, '0');
   return (
@@ -68,7 +70,7 @@ const Dial: React.FC<{ value: number; label: string; frac: number; flip: boolean
           </span>
         </span>
       </div>
-      <span className="t-label text-[8.5px] tracking-[0.18em] text-[#6A6E66] mt-2">{label}</span>
+      <span className={`t-label ${big ? "text-[10px]" : "text-[8.5px]"} tracking-[0.18em] text-[#6A6E66] mt-2`}>{label}</span>
     </div>
   );
 };
@@ -78,6 +80,8 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
 /** Still (00 · empty rings) until `started` — then the numbers roll up to the real time left and start ticking live. */
 export const Countdown: React.FC<{ started?: boolean }> = ({ started = true }) => {
+  const { UI, fmt } = useContent();
+  const { lang } = useLang();
   const [state, setState] = useState(timeLeft);
   const [phase, setPhase] = useState<'idle' | 'rolling' | 'live'>(started ? 'live' : 'idle');
   const [roll, setRoll] = useState(0); // eased 0 → 1 while rolling up
@@ -136,7 +140,7 @@ export const Countdown: React.FC<{ started?: boolean }> = ({ started = true }) =
         <CornerSprig className="absolute bottom-2 left-2 w-8 h-8" flip="y" />
         <CornerSprig className="absolute bottom-2 right-2 w-8 h-8" flip="xy" />
 
-        <h3 className="t-label text-[11px]">{state.done ? 'The Celebration Has Begun' : 'Counting Down to Forever'}</h3>
+        <h3 className="t-label text-[11px]">{state.done ? UI.celebrationBegun : UI.countingDown}</h3>
         <JewelDivider className="w-32 mt-2.5" />
 
         <div
@@ -144,10 +148,11 @@ export const Countdown: React.FC<{ started?: boolean }> = ({ started = true }) =
           role="timer"
           aria-live="off"
         >
-          {state.units.map((u) => (
+          {state.units.map((u, i) => (
             <Dial
               key={u.label}
-              label={u.label}
+              label={UI.units[i]}
+              big={lang === 'hi'}
               value={Math.round(u.value * k)}
               frac={phase === 'idle' ? 0 : u.max ? u.value / u.max : 1}
               flip={live}
@@ -159,10 +164,10 @@ export const Countdown: React.FC<{ started?: boolean }> = ({ started = true }) =
         {/* the date stays a secret until it is scratched open above */}
         <p className="t-poetic text-[16px] text-[#4A4740] mt-5 min-h-[1.5em]">
           {phase === 'idle' ? (
-            <span className="text-[#8C6F43]">Scratch the card above to start the countdown</span>
+            <span className="text-[#8C6F43]">{UI.scratchToStart}</span>
           ) : (
             <span className="date-pop inline-block">
-              {formatWeekday(WEDDING_DATE_ISO)}, {formatDate(WEDDING_DATE_ISO)} · {formatTime(WEDDING_DATE_ISO)}
+              {fmt.weekday(WEDDING_DATE_ISO)}, {fmt.date(WEDDING_DATE_ISO)} · {fmt.time(WEDDING_DATE_ISO)}
             </span>
           )}
         </p>

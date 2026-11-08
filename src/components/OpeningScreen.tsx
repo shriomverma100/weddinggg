@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IMAGES } from '../assets/placeholders';
-import { COUPLE } from '../data/content';
+import { useContent } from '../i18n';
 
 interface OpeningScreenProps {
   onOpen: () => void;
@@ -16,6 +16,8 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onOpen, isOpen }) 
     return () => clearTimeout(t);
   }, [isOpen]);
 
+  const { COUPLE, UI } = useContent();
+
   if (!mounted) return null;
 
   return (
@@ -25,7 +27,7 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onOpen, isOpen }) 
         isOpen ? 'opacity-0 pointer-events-none scale-105' : 'opacity-100 scale-100'
       }`}
       style={{ touchAction: 'manipulation', willChange: 'opacity, transform' }}
-      aria-label="Tap to open invitation"
+      aria-label={UI.tapToOpenAria}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -56,13 +58,13 @@ export const OpeningScreen: React.FC<OpeningScreenProps> = ({ onOpen, isOpen }) 
           </div>
 
           <p className="t-label text-[11px] tracking-[0.26em] text-white/90">
-            You Are Cordially Invited
+            {UI.cordiallyInvited}
           </p>
         </div>
 
         {/* Call to action — a soft pulse tells the guest this is tappable */}
         <div className="flex flex-col items-center">
-          <span className="t-poetic text-[23px] text-white tap-pulse">Tap to Open</span>
+          <span className="t-poetic text-[23px] text-white tap-pulse">{UI.tapToOpen}</span>
           <div className="w-16 h-px mt-2 bg-[#C9AE82]" />
         </div>
       </div>
