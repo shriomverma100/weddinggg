@@ -142,3 +142,47 @@ h1, h2, h3, blockquote { text-wrap: balance; }
 @keyframes flipIn { from { transform: perspective(240px) rotateX(-85deg); opacity: 0; } to { transform: none; opacity: 1; } }
 .dial-arc { transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
 @media (prefers-reduced-motion: reduce) { .flip-in { animation: none; } .dial-arc { transition: none; } }
+
+/* ── Scratch card micro-interactions ── */
+/* idle: a light sheen sweeps across the foil, inviting a touch */
+.foil-sweep { animation: foilSweep 2.8s ease-in-out infinite; transform: skewX(-18deg); }
+@keyframes foilSweep {
+  0% { transform: translateX(0) skewX(-18deg); opacity: 0; }
+  10% { opacity: 1; }
+  55%, 100% { transform: translateX(420%) skewX(-18deg); opacity: 0; }
+}
+/* idle: a finger traces a zig-zag scratch path */
+.finger-hint { animation: fingerHint 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+@keyframes fingerHint {
+  0%   { transform: translate(-70px, 4px); opacity: 0; }
+  12%  { opacity: 1; }
+  35%  { transform: translate(40px, -10px); }
+  60%  { transform: translate(-40px, 6px); }
+  82%  { transform: translate(60px, -6px); opacity: 1; }
+  100% { transform: translate(60px, -6px); opacity: 0; }
+}
+.finger-ripple { animation: fingerRipple 1.3s ease-out infinite; }
+@keyframes fingerRipple { from { transform: scale(0.5); opacity: 0.9; } to { transform: scale(1.8); opacity: 0; } }
+/* revealed: a gold ring pulses out of the card, and a shine glides over the date */
+.scratch-revealed { animation: revealRing 1.1s ease-out both; }
+@keyframes revealRing {
+  from { box-shadow: 0 0 0 0 rgba(201, 174, 130, 0.55), 0 0 0 0 rgba(201, 174, 130, 0.3); }
+  to   { box-shadow: 0 0 0 16px rgba(201, 174, 130, 0), 0 10px 30px -16px rgba(140, 111, 67, 0.45); }
+}
+.date-shine {
+  background: linear-gradient(110deg, #2E2B26 0%, #2E2B26 40%, #C9AE82 50%, #2E2B26 60%, #2E2B26 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: dateShine 1.6s 0.35s ease-out both;
+}
+@keyframes dateShine { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+
+/* countdown: wakes up with a soft gold pulse the moment the date is revealed */
+.countdown-wake { animation: revealRing 1.4s 0.2s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .foil-sweep, .finger-hint, .finger-ripple, .scratch-revealed, .countdown-wake { animation: none; }
+  .date-shine { animation: none; background: none; color: #2E2B26; }
+}

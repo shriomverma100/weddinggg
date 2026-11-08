@@ -14,6 +14,8 @@ import { ClosingMessage } from './components/ClosingMessage';
 
 export const App: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  // The countdown stays still until the guest scratches the date open.
+  const [dateRevealed, setDateRevealed] = useState(false);
 
   // Lock scrolling behind the opening screen so the guest always starts at the top of the card.
   useEffect(() => {
@@ -32,8 +34,8 @@ export const App: React.FC = () => {
           aria-hidden={!isOpen}
         >
           <TraditionalInvitation />
-          <ScratchToReveal />
-          <Countdown />
+          <ScratchToReveal onReveal={() => setDateRevealed(true)} />
+          <Countdown started={dateRevealed} />
           <FamilyBlessings />
           <ProgrammeHeading />
           <EventTimeline />

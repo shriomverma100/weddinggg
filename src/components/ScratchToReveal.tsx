@@ -1,16 +1,25 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Pointer } from 'lucide-react';
 import { WEDDING_DATE_ISO, formatDate, formatTime, formatWeekday } from '../data/content';
 
 const BRUSH_RADIUS = 16; // smaller brush = a longer, more satisfying scratch
 const REVEAL_AT = 0.55; // fraction of the card that must be scratched
 const CELL = 10; // coverage grid cell size (px) — avoids expensive getImageData reads
+const FLAKE_COLOURS = ['#C9AE82', '#D8C5A5', '#E9DCC0', '#B39363', '#F3EAD7'];
 
-export const ScratchToReveal: React.FC = () => {
+type Flake = { x: number; y: number; vx: number; vy: number; r: number; rot: number; vr: number; life: number; max: number; c: string };
+
+const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+export const ScratchToReveal: React.FC<{ onReveal?: () => void }> = ({ onReveal }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fxRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const fxCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawing = useRef(false);
   const lastPoint = useRef<{ x: number; y: number } | null>(null);
+  const finger = useRef<{ x: number; y: number } | null>(null);
   const grid = useRef<{ cols: number; rows: number; hit: Uint8Array; count: number }>({
     cols: 0,
     rows: 0,
@@ -18,27 +27,128 @@ export const ScratchToReveal: React.FC = () => {
     count: 0,
   });
   const sizeRef = useRef({ w: 0, h: 0 });
+  const flakes = useRef<Flake[]>([]);
+  const fxRaf = useRef(0);
   const lastBuzz = useRef(0);
+  const milestone = useRef(0);
   const progressRaf = useRef(0);
   const [progress, setProgress] = useState(0);
+  const [touched, setTouched] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const revealedRef = useRef(false);
+  const onRevealRef = useRef(onReveal);
+  onRevealRef.current = onReveal;
+
+  // ── Gold-flake particle layer (runs only while something is moving) ──
+  const runFx = useCallback(() => {
+    if (fxRaf.current) return;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const ctx = fxCtxRef.current;
+      const { w, h } = sizeRef.current;
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (!ctx) {
+        fxRaf.current = 0;
+        return;
+      }
+      ctx.clearRect(0, 0, w, h);
+
+      // soft golden glow under the fingertip
+      const f = finger.current;
+      if (f && drawing.current && !revealedRef.current) {
+        const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, BRUSH_RADIUS * 2.6);
+        g.addColorStop(0, 'rgba(255,246,222,0.55)');
+        g.addColorStop(0.5, 'rgba(216,197,165,0.22)');
+        g.addColorStop(1, 'rgba(216,197,165,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, BRUSH_RADIUS * 2.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const list = flakes.current;
+      for (let i = list.length - 1; i >= 0; i--) {
+        const p = list[i];
+        p.life += dt;
+        if (p.life >= p.max) {
+          list.splice(i, 1);
+          continue;
+        }
+        p.vy += 520 * dt; // gravity
+        p.vx *= 0.985;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.rot += p.vr * dt;
+        const a = 1 - p.life / p.max;
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.c;
+        // tiny diamond flake
+        ctx.beginPath();
+        ctx.moveTo(0, -p.r);
+        ctx.lineTo(p.r * 0.6, 0);
+        ctx.lineTo(0, p.r);
+        ctx.lineTo(-p.r * 0.6, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (list.length || drawing.current) fxRaf.current = requestAnimationFrame(tick);
+      else {
+        ctx.clearRect(0, 0, w, h);
+        fxRaf.current = 0;
+      }
+    };
+    fxRaf.current = requestAnimationFrame(tick);
+  }, []);
+
+  const spray = (x: number, y: number, dx: number, dy: number, n: number) => {
+    if (reduceMotion()) return;
+    for (let i = 0; i < n; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const sp = 40 + Math.random() * 110;
+      flakes.current.push({
+        x: x + (Math.random() - 0.5) * BRUSH_RADIUS,
+        y: y + (Math.random() - 0.5) * BRUSH_RADIUS,
+        vx: Math.cos(ang) * sp + dx * 6,
+        vy: Math.sin(ang) * sp - 90 + dy * 4,
+        r: 1.6 + Math.random() * 2.6,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 14,
+        life: 0,
+        max: 0.45 + Math.random() * 0.45,
+        c: FLAKE_COLOURS[(Math.random() * FLAKE_COLOURS.length) | 0],
+      });
+    }
+    if (flakes.current.length > 260) flakes.current.splice(0, flakes.current.length - 260);
+    runFx();
+  };
 
   const paintSurface = useCallback(() => {
     const canvas = canvasRef.current;
+    const fx = fxRef.current;
     const container = containerRef.current;
-    if (!canvas || !container || revealedRef.current) return;
+    if (!canvas || !fx || !container || revealedRef.current) return;
 
     const { width: w, height: h } = container.getBoundingClientRect();
     if (!w || !h) return;
     sizeRef.current = { w, h };
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
+    for (const c of [canvas, fx]) {
+      c.width = Math.round(w * dpr);
+      c.height = Math.round(h * dpr);
+    }
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const fxCtx = fx.getContext('2d');
+    if (!ctx || !fxCtx) return;
     ctxRef.current = ctx;
+    fxCtxRef.current = fxCtx;
+    fxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalCompositeOperation = 'source-over';
 
@@ -72,6 +182,7 @@ export const ScratchToReveal: React.FC = () => {
     const cols = Math.ceil(w / CELL);
     const rows = Math.ceil(h / CELL);
     grid.current = { cols, rows, hit: new Uint8Array(cols * rows), count: 0 };
+    milestone.current = 0;
     setProgress(0);
   }, []);
 
@@ -96,6 +207,8 @@ export const ScratchToReveal: React.FC = () => {
       cancelled = true;
       window.removeEventListener('resize', onResize);
       cancelAnimationFrame(progressRaf.current);
+      cancelAnimationFrame(fxRaf.current);
+      fxRaf.current = 0;
     };
   }, [paintSurface]);
 
@@ -124,11 +237,33 @@ export const ScratchToReveal: React.FC = () => {
   const reveal = useCallback(() => {
     if (revealedRef.current) return;
     revealedRef.current = true;
+    drawing.current = false;
     setIsRevealed(true);
     setProgress(1);
-    navigator.vibrate?.([12, 40, 18]);
+    navigator.vibrate?.([12, 40, 18, 40, 28]);
+
+    // celebratory burst of gold flakes from across the card
+    const { w, h } = sizeRef.current;
+    if (!reduceMotion()) {
+      for (let i = 0; i < 90; i++) {
+        flakes.current.push({
+          x: w / 2 + (Math.random() - 0.5) * w * 0.8,
+          y: h / 2 + (Math.random() - 0.5) * h * 0.5,
+          vx: (Math.random() - 0.5) * 260,
+          vy: -120 - Math.random() * 260,
+          r: 1.8 + Math.random() * 3,
+          rot: Math.random() * Math.PI,
+          vr: (Math.random() - 0.5) * 16,
+          life: 0,
+          max: 0.8 + Math.random() * 0.7,
+          c: FLAKE_COLOURS[(Math.random() * FLAKE_COLOURS.length) | 0],
+        });
+      }
+      runFx();
+    }
     window.dispatchEvent(new CustomEvent('petal-burst', { detail: { intensity: 0.35 } }));
-  }, []);
+    onRevealRef.current?.();
+  }, [runFx]);
 
   const scratchTo = (x: number, y: number) => {
     const ctx = ctxRef.current;
@@ -165,7 +300,14 @@ export const ScratchToReveal: React.FC = () => {
       progressRaf.current = 0;
       const gr = grid.current;
       const p = gr.hit.length ? gr.count / gr.hit.length : 0;
-      setProgress(Math.min(1, p / REVEAL_AT));
+      const shown = Math.min(1, p / REVEAL_AT);
+      setProgress(shown);
+      // a firmer haptic tick at every quarter — small rewards keep the guest scratching
+      const q = Math.floor(shown * 4);
+      if (q > milestone.current && q < 4) {
+        milestone.current = q;
+        navigator.vibrate?.(14);
+      }
       if (p >= REVEAL_AT) reveal();
     });
   };
@@ -178,21 +320,32 @@ export const ScratchToReveal: React.FC = () => {
   const onDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (revealedRef.current) return;
     drawing.current = true;
+    setTouched(true);
     e.currentTarget.setPointerCapture(e.pointerId);
     lastPoint.current = null;
     const p = localPoint(e);
+    finger.current = p;
     scratchTo(p.x, p.y);
+    spray(p.x, p.y, 0, 0, 6);
+    navigator.vibrate?.(6);
     scheduleProgress();
   };
 
   const onMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!drawing.current || revealedRef.current) return;
+    const before = lastPoint.current;
     // Coalesced events give every touch sample between frames → smooth, gap-free strokes.
     const events = e.nativeEvent.getCoalescedEvents?.() ?? [e.nativeEvent];
     for (const ev of events.length ? events : [e.nativeEvent]) {
       const p = localPoint(ev);
       scratchTo(p.x, p.y);
     }
+    const p = lastPoint.current!;
+    finger.current = p;
+    const dx = before ? p.x - before.x : 0;
+    const dy = before ? p.y - before.y : 0;
+    // faster strokes throw more flakes
+    spray(p.x, p.y, dx, dy, Math.min(5, 1 + Math.round(Math.hypot(dx, dy) / 8)));
     const now = performance.now();
     if (now - lastBuzz.current > 90) {
       lastBuzz.current = now;
@@ -204,6 +357,7 @@ export const ScratchToReveal: React.FC = () => {
   const onUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     drawing.current = false;
     lastPoint.current = null;
+    finger.current = null;
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {
@@ -212,19 +366,21 @@ export const ScratchToReveal: React.FC = () => {
   };
 
   const date = formatDate(WEDDING_DATE_ISO);
+  const pct = Math.round(progress * 100);
 
   return (
     <section className="w-full max-w-[420px] sm:max-w-[480px] md:max-w-[500px] mx-auto py-6 px-4">
       <div
         ref={containerRef}
-        className="relative w-full min-h-[190px] bg-white rounded-2xl border border-[#DDDCD3] shadow-xs select-none overflow-hidden flex flex-col items-center justify-center p-6 text-center"
+        className={`relative w-full min-h-[190px] bg-white rounded-2xl border shadow-xs select-none overflow-hidden flex flex-col items-center justify-center px-3 py-6 text-center transition-[border-color,box-shadow] duration-700 ${
+          isRevealed ? 'border-[#D8C5A5] scratch-revealed' : 'border-[#DDDCD3]'
+        }`}
       >
-        <div className={`flex flex-col items-center ${isRevealed ? 'date-pop' : ''}`}>
+        <div className={`relative flex flex-col items-center ${isRevealed ? 'date-pop' : ''}`}>
           <div className="w-10 h-0.5 bg-[#C9AE82] mb-3 rounded-full" />
-          <p className="t-label text-[11px] mb-2">
-            Save the Date
-          </p>
-          <h2 className="t-display text-[38px] sm:text-[42px] leading-tight">
+          <p className="t-label text-[11px] mb-2">Save the Date</p>
+          {/* always one line: scales with the phone width, caps at the desktop size */}
+          <h2 className={`t-display whitespace-nowrap text-[clamp(26px,9vw,42px)] leading-tight ${isRevealed ? 'date-shine' : ''}`}>
             {date}
           </h2>
           <p className="t-detail text-[12px] mt-2">
@@ -243,11 +399,25 @@ export const ScratchToReveal: React.FC = () => {
           tabIndex={isRevealed ? -1 : 0}
           role="button"
           aria-label={`Scratch to reveal the date. The date is ${date}.`}
-          className={`absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing transition-opacity duration-700 ease-out ${
-            isRevealed ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          className={`absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing transition-[opacity,transform,filter] duration-700 ease-out ${
+            isRevealed ? 'opacity-0 scale-110 blur-[2px] pointer-events-none' : 'opacity-100'
           }`}
           style={{ touchAction: 'none' }}
         />
+
+        {/* idle invitation to play: a foil shimmer sweep + a finger tracing a scratch path */}
+        {!touched && !isRevealed && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl" aria-hidden="true">
+            <div className="foil-sweep absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/55 to-transparent" />
+            <div className="finger-hint absolute left-1/2 top-[68%]">
+              <span className="absolute -left-3 -top-3 w-6 h-6 rounded-full bg-[#C9AE82]/30 finger-ripple" />
+              <Pointer className="relative w-6 h-6 text-[#6F5A35] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]" strokeWidth={1.6} />
+            </div>
+          </div>
+        )}
+
+        {/* gold flakes + fingertip glow */}
+        <canvas ref={fxRef} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" />
       </div>
 
       {/* Progress feedback: seeing the bar fill keeps guests scratching (goal-gradient effect) */}
@@ -255,14 +425,20 @@ export const ScratchToReveal: React.FC = () => {
         className={`mt-3 flex flex-col items-center gap-2 transition-opacity duration-500 ${isRevealed ? 'opacity-0' : 'opacity-100'}`}
         aria-hidden={isRevealed}
       >
-        <div className="w-32 h-[3px] rounded-full bg-[#ECE7DC] overflow-hidden">
+        <div className="relative w-40 h-[4px] rounded-full bg-[#ECE7DC] overflow-hidden">
           <div
-            className="h-full w-full bg-[#C9AE82] origin-left transition-transform duration-150 ease-out"
+            className="h-full w-full rounded-full bg-gradient-to-r from-[#D8C5A5] via-[#C9AE82] to-[#B39363] origin-left transition-transform duration-200 ease-out"
             style={{ transform: `scaleX(${progress})` }}
           />
         </div>
-        <p className="t-detail text-[11px]">
-          {progress === 0 ? 'Scratch the card with your finger' : progress < 0.7 ? 'Keep going…' : 'Almost there!'}
+        <p className="t-detail text-[11px] tabular-nums">
+          {progress === 0
+            ? 'Scratch the card with your finger'
+            : progress < 0.5
+              ? `Keep going… ${pct}%`
+              : progress < 0.8
+                ? `Halfway there… ${pct}%`
+                : `Almost there! ${pct}%`}
         </p>
       </div>
     </section>

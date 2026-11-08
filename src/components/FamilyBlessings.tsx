@@ -54,15 +54,38 @@ export const FamilyBlessings: React.FC = () => {
           <p className="t-display text-[18px]">{joinNames(FAMILY.kids)}</p>
         </div>
 
-        <Divider className="w-16 mb-6" small />
-
-        <blockquote className="t-poetic text-[24px] leading-snug text-[#2E2B26] max-w-[320px]">
-          {FAMILY.tagline.map((line) => (
-            <span key={line} className="block">
-              {line}
-            </span>
-          ))}
-        </blockquote>
+        {/* Family tagline as a pull-quote: soft sage-to-champagne blend, oversized gold quote marks */}
+        <figure className="relative w-full rounded-xl overflow-hidden border border-[#E4E1CC] bg-[linear-gradient(135deg,#EEF3EA_0%,#F6F4EA_50%,#FAF1DF_100%)] pt-9 pb-8 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+          {/* gentle glow so the blend feels lit from within */}
+          <span
+            className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-[radial-gradient(circle,rgba(216,197,165,0.35)_0%,rgba(216,197,165,0)_70%)] pointer-events-none"
+            aria-hidden="true"
+          />
+          <span
+            className="absolute left-3 top-0 font-['Playfair_Display'] text-[72px] leading-none text-[#C9AE82]/55 select-none pointer-events-none"
+            aria-hidden="true"
+          >
+            &ldquo;
+          </span>
+          <span
+            className="absolute right-3 -bottom-8 font-['Playfair_Display'] text-[72px] leading-none text-[#C9AE82]/55 select-none pointer-events-none"
+            aria-hidden="true"
+          >
+            &rdquo;
+          </span>
+          <blockquote className="relative t-poetic text-[clamp(15px,4.7vw,21px)] leading-snug text-[#3F4A3C]">
+            {FAMILY.tagline.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
+          </blockquote>
+          <figcaption className="relative mt-4 flex items-center justify-center gap-2">
+            <span className="w-6 h-px bg-[#C9AE82]" />
+            <span className="t-label text-[9.5px] text-[#8C6F43]">The Chourasia Family</span>
+            <span className="w-6 h-px bg-[#C9AE82]" />
+          </figcaption>
+        </figure>
       </div>
     </Reveal>
   );

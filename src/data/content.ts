@@ -7,8 +7,8 @@ export const COUPLE = {
   bride: 'Aditi',
   groom: 'Jeet',
   monogram: ['A', 'J'] as const,
-  brideParents: 'D/o Mr. Amit & Mrs. Bhawana Chourasia',
-  groomParents: 'S/o Mr. Mahesh & Mrs. Sangeeta Chourasia',
+  brideParents: 'D/o Mrs. Bhavana Amit Chourasia',
+  groomParents: 'S/o Mrs. Sangeeta Mahesh Chourasia',
 };
 
 export const INVITATION = {
@@ -39,7 +39,7 @@ export const FAMILY = {
   blessings: [
     'Shri Narayan Prasad Chourasia',
     'Smt. Rajni Devi Prasad Chourasia',
-    'Smt. Bhawana Amit Chourasia',
+    'Smt. Bhavana Amit Chourasia',
     'Smt. Sandhya Vineet Chourasia',
     'Smt. Kanchan Sapanraj Chourasia',
     'Smt. Mansee Paritosh Chourasia',
