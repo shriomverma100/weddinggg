@@ -1,7 +1,6 @@
 import React from 'react';
 import { useContent } from '../i18n';
 import { Divider } from './Divider';
-import { ShareInvite } from './ShareInvite';
 
 export const ClosingMessage: React.FC = () => {
   const { CLOSING } = useContent();
@@ -19,8 +18,6 @@ export const ClosingMessage: React.FC = () => {
           aria-hidden="true"
         />
       </h3>
-
-      <ShareInvite />
 
       <div className="pt-6 border-t border-[#DDDCD3]/60">
         <p className="t-label text-[13px] tracking-[0.4em]">{CLOSING.footer}</p>

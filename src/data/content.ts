@@ -174,11 +174,6 @@ const en = {
     getDirections: 'Get Directions',
     playMusic: 'Play music',
     pauseMusic: 'Pause music',
-    shareInvite: 'Share the Invitation',
-    shareWhatsApp: 'WhatsApp',
-    copyLink: 'Copy link',
-    linkCopied: 'Link copied!',
-    shareText: 'You are cordially invited to the wedding of Aditi & Jeet 💌 Open the invitation and scratch to reveal the date:',
   },
   fmt: fmtEn,
 };
@@ -292,11 +287,6 @@ const hi: Content = {
     getDirections: 'रास्ता देखें',
     playMusic: 'संगीत चलाएँ',
     pauseMusic: 'संगीत रोकें',
-    shareInvite: 'निमंत्रण साझा करें',
-    shareWhatsApp: 'व्हाट्सऐप',
-    copyLink: 'लिंक कॉपी करें',
-    linkCopied: 'लिंक कॉपी हो गया!',
-    shareText: 'अदिति और जीत के शुभ विवाह में आप सादर आमंत्रित हैं 💌 निमंत्रण खोलें और तिथि जानने के लिए कार्ड खुरचें:',
   },
   fmt: fmtHi,
 };
